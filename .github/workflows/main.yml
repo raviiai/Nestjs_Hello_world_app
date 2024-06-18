@@ -22,15 +22,12 @@ jobs:
       run: npm install
 
     - name: Deploy to EC2
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        EC2_USER: ${{ secrets.EC2_USER }}
-        EC2_HOST: ${{ secrets.EC2_HOST }}
-      run: |
-        echo "$SSH_PRIVATE_KEY" > private_key
-        chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key $EC2_USER@$EC2_HOST << 'EOF'
-          cd /home/ec2-user/Nestjs_Hello_world_app
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /home/ubuntu/Nestjs_Hello_world_app
           npm install
-          npm run
-        EOF
+          npm run start
